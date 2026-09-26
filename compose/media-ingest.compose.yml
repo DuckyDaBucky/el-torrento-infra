@@ -1,8 +1,11 @@
-# Not applied. Own VM only (proposed vmid 103). Never merge onto media-apps.
+# Ingest VM 103 only. Never merge onto media-apps.
+# root_squash maps UID 0 to the anonymous user. It does not map UID 1000 to nobody.
+# /mnt/downloads must be owned or ACL'd for 1000:1000. Prove the write with
+# scripts/prove-ingest-write.sh as that user, without sudo.
 
 services:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent@sha256:PIN_BEFORE_USE
+    image: lscr.io/linuxserver/qbittorrent:5.0.1
     environment:
       PUID: "1000"
       PGID: "1000"
@@ -10,15 +13,27 @@ services:
       WEBUI_PORT: "8080"
     volumes:
       - /mnt/downloads:/downloads
+      - qbit-config:/config
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     restart: unless-stopped
 
   libtorrent-engine:
-    image: ghcr.io/hasnain-niazi/el-torrento-engine@sha256:PIN_BEFORE_USE
+    image: el-torrento-engine:local
+    build:
+      context: ../../el-torrento/engine
+      dockerfile: Dockerfile
+    user: "1000:1000"
+    environment:
+      ENGINE_TOKEN: ${ENGINE_TOKEN}
     volumes:
-      - /mnt/downloads:/downloads:ro
+      - /mnt/downloads:/downloads
+    ports:
+      - "192.168.4.53:8741:8741"
     restart: unless-stopped
+
+volumes:
+  qbit-config: {}
 
 # No library mount. No stream-cache mount. No docker.sock. No network_mode: host.
 # No Proxmox or management credentials in this file.

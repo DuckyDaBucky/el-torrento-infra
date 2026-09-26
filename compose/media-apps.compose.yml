@@ -1,75 +1,79 @@
-# Not applied. Digests must replace PIN_BEFORE_USE before any pull.
-# Target: VM 102 on pve3040a. Never the ingest VM.
+# Apps VM 102. The app database is SQLite on this VM's disk, not Postgres.
+# Custom image: build from el-torrento/Dockerfile, tag el-torrento-web:local.
+# Registry digests replace that tag only after scripts/publish-images.sh pushes them.
 
 services:
-  postgres:
-    image: postgres@sha256:PIN_BEFORE_USE
+  web:
+    image: el-torrento-web:local
+    build:
+      context: ../../el-torrento
+      dockerfile: Dockerfile
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: eltorrento
-      POSTGRES_DB: eltorrento
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks: [apps]
-    restart: unless-stopped
-
-  api:
-    image: ghcr.io/hasnain-niazi/el-torrento-api@sha256:PIN_BEFORE_USE
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
+      ELTORRENTO_DB: /app/data/app.sqlite
+      ENGINE_URL: http://192.168.4.53:8741
+      ENGINE_TOKEN: ${ENGINE_TOKEN}
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       BOOTSTRAP_OWNER_EMAIL: ${BOOTSTRAP_OWNER_EMAIL}
-    networks: [apps, mgmt]
-    restart: unless-stopped
-
-  watch:
-    image: ghcr.io/hasnain-niazi/el-torrento-watch@sha256:PIN_BEFORE_USE
+      JELLYFIN_URL: http://192.168.4.50:8096
+      JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
+      SEERR_URL: http://seerr:5055
+      SEERR_API_KEY: ${SEERR_API_KEY}
+      PIECE_WAIT_MS: "8000"
+    volumes:
+      - app-data:/app/data
     networks: [apps]
     restart: unless-stopped
 
   caddy:
-    image: caddy@sha256:PIN_BEFORE_USE
+    image: caddy:2.8.4
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
     networks: [apps]
     restart: unless-stopped
 
   seerr:
-    image: ghcr.io/seerr-team/seerr@sha256:PIN_BEFORE_USE
+    image: ghcr.io/seerr-team/seerr:v3.0.0
+    volumes:
+      - seerr-config:/app/config
     networks: [apps]
     restart: unless-stopped
 
   sonarr:
-    image: lscr.io/linuxserver/sonarr@sha256:PIN_BEFORE_USE
+    image: lscr.io/linuxserver/sonarr:4.0.9
+    volumes:
+      - sonarr-config:/config
     networks: [apps]
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr@sha256:PIN_BEFORE_USE
+    image: lscr.io/linuxserver/radarr:5.10.4
+    volumes:
+      - radarr-config:/config
     networks: [apps]
     restart: unless-stopped
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr@sha256:PIN_BEFORE_USE
+    image: lscr.io/linuxserver/prowlarr:1.25.3
+    volumes:
+      - prowlarr-config:/config
     networks: [apps]
     restart: unless-stopped
 
-  mgmt-worker:
-    image: ghcr.io/hasnain-niazi/el-torrento-mgmt@sha256:PIN_BEFORE_USE
-    environment:
-      PVE_MUTATION_TOKEN_ID: ${PVE_MUTATION_TOKEN_ID}
-      PVE_MUTATION_TOKEN_SECRET: ${PVE_MUTATION_TOKEN_SECRET}
-    networks: [mgmt]
-    # no ports published
-    restart: unless-stopped
-
 volumes:
-  pgdata: {}
+  app-data: {}
+  caddy-data: {}
+  caddy-config: {}
+  seerr-config: {}
+  sonarr-config: {}
+  radarr-config: {}
+  prowlarr-config: {}
 
 networks:
   apps: {}
-  mgmt:
-    internal: true
