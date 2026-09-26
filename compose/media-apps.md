@@ -2,7 +2,7 @@
 
 Target guest: VM 102 on `pve3040a` only. Do not place this file’s services on the ingest VM.
 
-Services: one Next.js `web` image (Watch, admin, API, HLS worker), `seerr`, `sonarr`, `radarr`, `prowlarr`, and `caddy`. The app database is SQLite on the VM disk. Postgres is not used. The management worker is still design-only and is not in this file.
+Services: `api` (admin + SQLite API), `watch` (family UI, proxies `/api` to `api`), `mgmt-worker` (internal Proxmox allowlist), `seerr`, `sonarr`, `radarr`, `prowlarr`, and `caddy`. HLS transcoding runs on VM 100 `media-worker`, not here. Postgres is not used.
 
 Not included here: qBittorrent, libtorrent, Jellyfin, FFmpeg.
 

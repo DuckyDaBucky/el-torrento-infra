@@ -1,17 +1,18 @@
-# Apps VM 102. The app database is SQLite on this VM's disk, not Postgres.
-# Custom image: build from el-torrento/Dockerfile, tag el-torrento-web:local.
-# Registry digests replace that tag only after scripts/publish-images.sh pushes them.
+# Apps VM 102. SQLite on app-data volume (api service only). docker-compose 1.29 compatible.
+# Custom images: scripts/publish-images.sh. Pin tags in image-pins.env when digests exist.
 
 services:
-  web:
+  api:
     image: el-torrento-web:local
     build:
       context: ../../el-torrento
       dockerfile: Dockerfile
     environment:
+      ELTORRENTO_ROLE: admin
       ELTORRENTO_DB: /app/data/app.sqlite
       ENGINE_URL: http://192.168.4.53:8741
       ENGINE_TOKEN: ${ENGINE_TOKEN}
+      MEDIA_WORKER_URL: http://192.168.4.50:8088
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
       CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
@@ -20,10 +21,37 @@ services:
       JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
       SEERR_URL: http://seerr:5055
       SEERR_API_KEY: ${SEERR_API_KEY}
+      PROWLARR_URL: http://prowlarr:9696
+      PROWLARR_API_KEY: ${PROWLARR_API_KEY}
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      MGMT_WORKER_URL: http://mgmt-worker:9090
       PIECE_WAIT_MS: "8000"
     volumes:
       - app-data:/app/data
+    networks: [apps, mgmt]
+    restart: unless-stopped
+
+  watch:
+    image: el-torrento-web:local
+    environment:
+      ELTORRENTO_ROLE: watch
+      INTERNAL_API_URL: http://api:3000
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+    depends_on: [api]
     networks: [apps]
+    restart: unless-stopped
+
+  mgmt-worker:
+    image: el-torrento-mgmt-worker:local
+    build:
+      context: ../mgmt-worker
+      dockerfile: Dockerfile
+    environment:
+      PVE_MUTATION_TOKEN: ${PVE_MUTATION_TOKEN}
+      PVE_HOSTS: ${PVE_HOSTS:-192.168.4.20,192.168.4.109,192.168.4.33}
+    networks: [mgmt]
     restart: unless-stopped
 
   caddy:
@@ -35,6 +63,7 @@ services:
       - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+    depends_on: [api, watch]
     networks: [apps]
     restart: unless-stopped
 
@@ -77,3 +106,4 @@ volumes:
 
 networks:
   apps: {}
+  mgmt: {}

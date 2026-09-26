@@ -1,5 +1,6 @@
 # Playback VM 100. Do not rebuild that guest to apply this file.
 # Jellyfin config and transcode temp stay on the VM disk. Library is read-only NFS.
+# Progressive HLS for El Torrento runs in media-worker, not in the apps VM.
 
 services:
   jellyfin:
@@ -12,10 +13,26 @@ services:
       - "8096:8096"
     restart: unless-stopped
 
+  media-worker:
+    image: el-torrento-media-worker:local
+    build:
+      context: ../../el-torrento/media-worker
+      dockerfile: Dockerfile
+    environment:
+      ENGINE_URL: http://192.168.4.53:8741
+      ENGINE_TOKEN: ${ENGINE_TOKEN}
+      PIECE_WAIT_MS: "8000"
+      HLS_CACHE: /cache/hls
+    volumes:
+      - hls-cache:/cache/hls
+    ports:
+      - "8088:8080"
+    restart: unless-stopped
+
 volumes:
   jellyfin-config: {}
   transcode-temp: {}
+  hls-cache: {}
 
 # iGPU devices are omitted until a benchmark says the device exists.
 # Do not add /dev/dri here by default.
-# Progressive HLS for El Torrento runs in the apps web image, not here.
