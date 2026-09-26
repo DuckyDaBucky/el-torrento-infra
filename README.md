@@ -2,7 +2,7 @@
 
 Guest layout, Compose skeletons, Caddy, NFS, and firewall notes for the homelab cluster `homelab`.
 
-Nothing in this repo is applied by committing it. Stage 1 is documentation plus a read-only preflight. VM 100 stays as it is.
+Guests **101–103** are live on the cluster (see [guests-live.md](../docs/guests-live.md)). Compose here is still applied by hand on each VM. VM 100 stays as it is.
 
 Application code lives in `el-torrento`.
 
@@ -19,4 +19,4 @@ Ingest isolation is mandatory. Ingest never shares the application VM. There is 
 
 Preflight (see `docs/preflight.md`) shows `pve3040a` can technically hold two small disks, but RAM is the tight resource. The proposal for review is: apps stay on `pve3040a`, and ingest is its own VM on `pve-3040b` next to storage. That is still two VMs. It is not a shared application VM.
 
-Vmids 101–103 are unused. `.51`–`.53` did not answer SSH, which does not prove the addresses are free. See `docs/preflight.md`.
+Vmids 101–103 are in use at `.51`–`.53`. See [guests-live.md](../docs/guests-live.md) and historical capacity in `docs/preflight.md`.
