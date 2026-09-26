@@ -8,19 +8,6 @@ Mounts: library and stream-cache read-only from NFS. Transcode temp on the VM’
 
 iGPU passthrough is not assumed. `docs/preflight.md` records whether the host even shows an Intel VGA device. Software transcode stays off until a benchmark on this VM says a given quality holds realtime.
 
-```yaml
-# not applied
-services:
-  jellyfin:
-    image: jellyfin/jellyfin@sha256:PIN_BEFORE_USE
-    volumes:
-      - /mnt/library:/media:ro
-      - jellyfin-config:/config
-  stream-gateway:
-    image: ghcr.io/hasnain-niazi/el-torrento-gateway@sha256:PIN_BEFORE_USE
-    volumes:
-      - /mnt/library:/data/library:ro
-      - /mnt/stream-cache:/data/stream-cache:ro
-volumes:
-  jellyfin-config: {}
-```
+The service file is `media-playback.compose.yml`. Image tags are the ones in that file. There is no digest placeholder.
+
+Before starting it, run `../scripts/require-nfs-mount.sh /mnt/library`. If that check fails, do not start containers. The script does not start them.

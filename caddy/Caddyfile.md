@@ -3,17 +3,16 @@
 Not installed in stage 1. Intended for the apps VM.
 
 ```caddyfile
-# LAN split-horizon names point here directly.
-# Away from home, watch and media use Tailscale or a direct HTTPS listener.
-# They are not orange-cloud proxied. server.hasnain.us may use a Cloudflare tunnel
-# to this same Caddy, because it is HTML and API, not video.
+# server.hasnain.us is the admin and API process. Admin may use Cloudflare Access.
+# watch.hasnain.us and media.hasnain.us are video.
+# Video must not use the free Cloudflare tunnel.
 
 server.hasnain.us {
-	reverse_proxy api:3001
+	reverse_proxy api:3847
 }
 
 watch.hasnain.us {
-	reverse_proxy watch:3000
+	reverse_proxy watch:3847
 }
 
 media.hasnain.us {

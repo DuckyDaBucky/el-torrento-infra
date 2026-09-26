@@ -1,13 +1,15 @@
-# LAN split-horizon names point at the apps VM.
-# watch and media are not orange-cloud proxied.
-# server.hasnain.us may arrive through a Cloudflare tunnel because it is not video.
+# server.hasnain.us is the admin and API process. Admin may use Cloudflare Access.
+# watch.hasnain.us and media.hasnain.us are video.
+# Video must not use the free Cloudflare tunnel.
+# Away from home, video uses split-horizon DNS, Tailscale, or direct HTTPS.
+# The api and watch images listen on 3847 (`next start -p 3847`).
 
 server.hasnain.us {
-	reverse_proxy api:3000
+	reverse_proxy api:3847
 }
 
 watch.hasnain.us {
-	reverse_proxy watch:3000
+	reverse_proxy watch:3847
 }
 
 media.hasnain.us {
