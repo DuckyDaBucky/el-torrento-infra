@@ -64,7 +64,7 @@ Hardware transcode is not available inside VM 100 until a later, reviewed passth
 - Apps VM on `pve3040a`: not blocked for a single modest guest.
 - Ingest on the apps VM: not allowed, regardless of space.
 - Ingest as its own VM on `pve3040a` beside apps: disks can fit (the pool is 54 GiB), RAM is tight if both guests are several gigabytes.
-- Ingest as its own VM on `pve-3040b` beside storage: fits the pool and keeps 3040a’s RAM for apps and the management worker.
+- Ingest as its own VM on `pve-3040b` beside storage: after a ~220 GiB storage data disk, the thin pool still has on the order of ~118 GiB for a small ingest OS disk. RAM on 3040b is the same constraint as for storage. Keeping apps on 3040a preserves RAM there for the management worker.
 
 Proposed for review, not created: VM 101 storage and VM 103 ingest on `pve-3040b`, VM 102 apps on `pve3040a`, VM 100 left as the playback guest.
 
