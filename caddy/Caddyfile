@@ -1,0 +1,15 @@
+# LAN split-horizon names point at the apps VM.
+# watch and media are not orange-cloud proxied.
+# server.hasnain.us may arrive through a Cloudflare tunnel because it is not video.
+
+server.hasnain.us {
+	reverse_proxy api:3001
+}
+
+watch.hasnain.us {
+	reverse_proxy watch:3000
+}
+
+media.hasnain.us {
+	reverse_proxy 192.168.4.50:8096
+}

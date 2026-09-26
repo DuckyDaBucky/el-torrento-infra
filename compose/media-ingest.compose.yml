@@ -1,0 +1,24 @@
+# Not applied. Own VM only (proposed vmid 103). Never merge onto media-apps.
+
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent@sha256:PIN_BEFORE_USE
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Chicago
+      WEBUI_PORT: "8080"
+    volumes:
+      - /mnt/downloads:/downloads
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  libtorrent-engine:
+    image: ghcr.io/hasnain-niazi/el-torrento-engine@sha256:PIN_BEFORE_USE
+    volumes:
+      - /mnt/downloads:/downloads:ro
+    restart: unless-stopped
+
+# No library mount. No stream-cache mount. No docker.sock. No network_mode: host.
+# No Proxmox or management credentials in this file.

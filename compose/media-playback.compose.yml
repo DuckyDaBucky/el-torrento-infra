@@ -1,0 +1,29 @@
+# Not applied. Target is existing VM 100. Do not rebuild that guest to use this file.
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin@sha256:PIN_BEFORE_USE
+    volumes:
+      - /mnt/library:/media:ro
+      - jellyfin-config:/config
+      - transcode-temp:/cache
+    ports:
+      - "8096:8096"
+    restart: unless-stopped
+
+  stream-gateway:
+    image: ghcr.io/hasnain-niazi/el-torrento-gateway@sha256:PIN_BEFORE_USE
+    volumes:
+      - /mnt/library:/data/library:ro
+      - /mnt/stream-cache:/data/stream-cache:ro
+      - ../config-placeholder:/config:ro
+    ports:
+      - "8088:8080"
+    restart: unless-stopped
+
+volumes:
+  jellyfin-config: {}
+  transcode-temp: {}
+
+# iGPU devices are omitted until preflight and a benchmark say the device exists.
+# Do not add /dev/dri here by default.
