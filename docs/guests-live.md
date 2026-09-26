@@ -36,8 +36,12 @@ Not exported to `.52` or the whole LAN.
 
 No NFS mounts. Attempts to mount library or downloads from `.51` were denied.
 
+## Systemd mount examples
+
+See [../systemd/](../systemd/) for `media-playback.mount.example` and `media-ingest.mount.example`. Isolation summary: [storage-isolation-verified.md](./storage-isolation-verified.md).
+
 ## Next (not done here)
 
-- Mount NFS on **192.168.4.50** (VM 100) for playback.
+- Mount NFS on **192.168.4.50** (VM 100) for playback using the playback mount unit.
 - Docker Compose on **192.168.4.52** and ingest stack on **192.168.4.53** per [el-torrento-infra/compose/](../el-torrento-infra/compose/).
 - Stage 1 read-only numbers remain in [preflight](../el-torrento-infra/docs/preflight.md) for capacity baseline.
