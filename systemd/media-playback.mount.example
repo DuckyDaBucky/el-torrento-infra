@@ -1,18 +1,17 @@
-# Example systemd mount unit for media-playback (VM 100, 192.168.4.50).
-# Install as /etc/systemd/system/srv-media-library.mount (and stream-cache sibling).
-# Requires nfs-common and matching .automount if you want boot-time mount.
+# /etc/systemd/system/mnt-library.mount
+# VM 100 (192.168.4.50) — library read-only
 
 [Unit]
-Description=NFS library read-only for playback
+Description=NFS library for playback
 After=network-online.target
 Wants=network-online.target
 Before=docker.service
 
 [Mount]
 What=192.168.4.51:/srv/media/library
-Where=/mnt/media/library
+Where=/mnt/library
 Type=nfs4
-Options=_netdev,ro,hard,timeo=600,retrans=2,rsize=1048576,wsize=1048576
+Options=_netdev,noatime,ro,hard,timeo=600,retrans=2
 
 [Install]
 WantedBy=multi-user.target
