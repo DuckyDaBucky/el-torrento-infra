@@ -191,7 +191,7 @@ services:
 
   prowlarr:
     # linuxserver s6 must start as root, then drops to PUID:PGID. Do not set user.
-    image: lscr.io/linuxserver/prowlarr:1.25.3
+    image: lscr.io/linuxserver/prowlarr:2.6.5.5623-ls162
     environment:
       PUID: "1000"
       PGID: "1000"
