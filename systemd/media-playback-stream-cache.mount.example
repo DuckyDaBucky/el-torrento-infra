@@ -1,0 +1,16 @@
+# /etc/systemd/system/mnt-stream\\x2dcache.mount
+# VM 100 — stream cache read-write from storage export
+
+[Unit]
+Description=NFS stream cache for playback
+After=network-online.target mnt-library.mount
+Wants=network-online.target
+
+[Mount]
+What=192.168.4.51:/srv/media/stream-cache
+Where=/mnt/stream-cache
+Type=nfs4
+Options=_netdev,noatime
+
+[Install]
+WantedBy=multi-user.target

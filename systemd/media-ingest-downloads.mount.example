@@ -1,0 +1,16 @@
+# /etc/systemd/system/mnt-downloads.mount
+# VM 103 (192.168.4.53) — downloads only
+
+[Unit]
+Description=NFS downloads for ingest
+After=network-online.target
+Wants=network-online.target
+
+[Mount]
+What=192.168.4.51:/srv/media/downloads
+Where=/mnt/downloads
+Type=nfs4
+Options=_netdev,noatime
+
+[Install]
+WantedBy=multi-user.target

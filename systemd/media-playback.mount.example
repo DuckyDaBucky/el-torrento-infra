@@ -1,0 +1,16 @@
+# /etc/systemd/system/mnt-library.mount
+# VM 100 (192.168.4.50) — library read-only
+
+[Unit]
+Description=NFS library for playback
+After=network-online.target
+Wants=network-online.target
+
+[Mount]
+What=192.168.4.51:/srv/media/library
+Where=/mnt/library
+Type=nfs4
+Options=_netdev,noatime,ro
+
+[Install]
+WantedBy=multi-user.target
