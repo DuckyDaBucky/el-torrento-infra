@@ -14,5 +14,7 @@ See also [guests-live.md](../../docs/guests-live.md) in the Project repo.
 | Ingest library mount | Denied (expected) |
 | Ingest → Proxmox :8006 | Blocked |
 | Ingest → apps `.52` | Blocked |
+| Playback `.50` library + stream-cache NFS | Mounted (ro / rw) per [guests-live.md](../../docs/guests-live.md) |
+| Apps `.52` Docker | Running; Compose not applied |
 
 Systemd mount examples: `../systemd/*.mount.example`.
